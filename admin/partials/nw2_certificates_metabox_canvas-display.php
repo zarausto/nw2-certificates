@@ -43,6 +43,35 @@
         font-family: 'Arial', sans-serif;
     }
 
+    .container-txt a.delete,
+    .container-txt .editor-buttons {
+        position: absolute;
+        display: block;
+        right: -12px;
+        top: -10px;
+        font-size: 10px;
+        background: #ccc;
+        height: 10px;
+        line-height: 10px;
+        border-radius: 10px;
+        padding: 4px;
+        width: 10px;
+        color: #FFF;
+        cursor: pointer;
+    }
+
+    .container-txt a.delete {
+        background: #dc2626;
+    }
+
+    .container-txt a.plus {
+        background: green;
+    }
+
+    .container-txt a.minus {
+        background: blue;
+    }
+
     .container-txt:not(.img) span {
         display: block;
         transform-origin: top center;
@@ -92,22 +121,24 @@
 
         $("#nw2_add_text").on('click', function(e) {
             e.preventDefault();
-            $('.clones > .container-txt').clone().prop("id", ("temp_" + Math.floor(Math.random() * 692) + 1)).appendTo("#nw2-stage")
-                .draggable({
-                    stop: function(e, ui) {
-                        convertPer($(this));
-                        convertWPer($(this));
-                    }
-                })
-                .resizable({
-                    containment: $('#nw2-container'),
-                    minWidth: 50,
-                    minHeight: 18,
-                    stop: function(e, ui) {
-                        convertPer($(this));
-                        convertWPer($(this));
-                    }
-                });
+            $('.clones > .container-txt').clone().prop("id", ("temp_" + Math.floor(Math.random() * 692) + 1)).appendTo("#nw2-stage");
+            init();
+            /*
+                            .draggable({
+                                stop: function(e, ui) {
+                                    convertPer($(this));
+                                    convertWPer($(this));
+                                }
+                            })
+                            .resizable({
+                                containment: $('#nw2-container'),
+                                minWidth: 50,
+                                minHeight: 18,
+                                stop: function(e, ui) {
+                                    convertPer($(this));
+                                    convertWPer($(this));
+                                }
+                            });/**/
         });
         $("#publish").on('hover', function() {
             console.log("Go publish!"); //ui-resizable
@@ -136,7 +167,39 @@
                         convertPer($(this));
                         convertWPer($(this));
                     }
-                });
+                })
+                .mouseenter(function() {
+                    $btdel = $('<a class="editor-buttons delete">X</a>').on('click', function(el) {
+                        $(this).parent().remove();
+                    });
+                    $btplus = $('<a class="editor-buttons font-button plus" style="right:20px;">+</a>').on('click', function(el) {
+                        $(this).bind("click", function() {
+                            var size = parseInt($(this).parent().css("font-size"));
+                            size = size + 1;
+                            size = parseInt(size) * 72 / 96;
+                            console.log('plus ' + size);
+                            $(this).parent().css("font-size", size + 'pt');
+                        });
+                    });
+                    $btminus = $('<a class="editor-buttons font-button minus" style="right:60px;">-</a>').on('click', function(el) {
+                        $(this).bind("click", function() {
+                            var size = parseInt($(this).parent().css("font-size"));
+                            size = size - 1;
+                            if (size <= 1) {
+                                size = 1;
+                            }
+                            size = parseInt(size) * 72 / 96;
+
+                            $(this).parent().css("font-size", size + 'pt');
+                        });
+                    });
+                    $(this).append($btdel);
+                    $(this).append($btplus);
+                    $(this).append($btminus);
+                })
+                .mouseleave(function() {
+                    $(this).find('.editor-buttons').remove();
+                }); /**/
             $('.ui-resizable-handle').mouseenter(function() {
                     $(this).parent().resizable('enable');
                     $(this).parent().draggable('disable');
@@ -150,6 +213,18 @@
                 });
 
         }
+        $(".font-button").bind("click", function() {
+            var size = parseInt($(this).parent().css("font-size"));
+            if ($(this).hasClass("plus")) {
+                size = size + 2;
+            } else {
+                size = size - 2;
+                if (size <= 10) {
+                    size = 10;
+                }
+            }
+            $(this).parent().css("font-size", size);
+        });
 
         function askImage() {
             var txt;
@@ -167,6 +242,7 @@
             }
 
         }
+
 
         function convertPer($this) {
             var l = (100 * parseFloat($this.position().left / parseFloat($this.parent().width()))) + "%";
