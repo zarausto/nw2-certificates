@@ -1,0 +1,22 @@
+{
+    "name": "fausto/nw2-certificates",
+    "description": "Plugin to generate certificates",
+    "type": "wordpress-plugin",
+    "require": {
+        "wpbp/fakepage": "dev-master",
+        "mpdf/mpdf": "^8.0",
+        "tecnickcom/tcpdf": "^6.3"
+    },
+    "extra": {
+        "wordpress-install-dir": "wp"
+    },
+    "authors": [
+        {
+            "name": "Zarausto - Fausto",
+            "email": "faustortoloi@gmail.com"
+        }
+    ],
+    "autoload": {
+        "files": ["vendor/redux-framework-4/ReduxCore/framework.php"]
+    }
+}

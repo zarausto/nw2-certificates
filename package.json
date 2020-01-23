@@ -1,0 +1,11 @@
+{
+  "name": "nw2-certificates",
+  "version": "1.0.0",
+  "description": "Plugin for Wordpress to generate PDFs certificates for events",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fausto Rodrigo Toloi",
+  "license": "ISC"
+}
