@@ -102,39 +102,6 @@ class Nw2_Certificates_Admin
 		self::$plugin_cpt_static = $this->plugin_cpt = substr($this->plugin_name . '_events', 0, 20);
 
 		$this->print_link =  get_site_url() . '/' . $this->plugin_name . '/';
-
-		/* garbage */
-		$opt_name = 'redux_demo';
-		$theme = wp_get_theme(); // For use with some settings. Not necessary.
-
-		$args = array(
-			'display_name'         => $theme->get('Name'),
-			'display_version'      => $theme->get('Version'),
-			'menu_title'           => esc_html__('Sample Options', 'redux-framework-demo'),
-			'customizer'           => true,
-		);
-
-
-		Redux::setArgs($opt_name, $args);
-
-		Redux::setSection($opt_name, array(
-			'title'  => esc_html__('Basic Field', 'redux-framework-demo'),
-			'id'     => 'basic',
-			'desc'   => esc_html__('Basic field with no subsections.', 'redux-framework-demo'),
-			'icon'   => 'el el-home',
-			'fields' => array(
-				array(
-					'id'       => 'opt-text',
-					'type'     => 'text',
-					'title'    => esc_html__('Example Text', 'redux-framework-demo'),
-					'desc'     => esc_html__('Example description.', 'redux-framework-demo'),
-					'subtitle' => esc_html__('Example subtitle.', 'redux-framework-demo'),
-					'hint'     => array(
-						'content' => 'This is a <b>hint</b> tool-tip for the text field.<br/><br/>Add any HTML based text you like here.',
-					)
-				)
-			)
-		));
 	}
 
 	public static function _get_plugin_cpt()
@@ -161,7 +128,7 @@ class Nw2_Certificates_Admin
 	{
 		add_meta_box(
 			$this->plugin_name . '_cf7',    				 	// $id
-			_('Contact Form'),				                 	// $title
+			_('NW2 Certificates'),				                 	// $title
 			array($this, 'nw2_certificates_show_metaboxes'),  	// $callback
 			$this->plugin_cpt,                 					// $page
 			'normal',                  							// $context
@@ -172,6 +139,7 @@ class Nw2_Certificates_Admin
 	{
 		// Use nonce for verification to secure data sending
 		wp_nonce_field(basename(__FILE__), $this->plugin_name . '_nonce');
+
 
 		$this->nw2_certificates_metabox_cf7();
 		$this->nw2_certificates_metabox_canvas();
@@ -212,11 +180,16 @@ class Nw2_Certificates_Admin
 		}
 		$options = array();
 		$forms = WPCF7_ContactForm::find();
+		$form_used = false;
 		foreach ($forms as $form) {
 			$array[$form->id()] = $form->title();
 			$selected = "";
 			if ($form->id() == $cf7) {
 				$selected = 'selected';
+				$form_used = array(
+					'id_form' => $form->id(),
+					'title' => $form->title(),
+				);
 			}
 			$options[] = '<option value="' . $form->id() . '" ' . $selected . '>' . $form->title() . '</option>';
 		}
@@ -229,25 +202,14 @@ class Nw2_Certificates_Admin
 	public function calculate_canvas_size()
 	{
 		global $post;
-
 		$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'full', false);
 		if (!$src) {
 			return;
 		}
-		//$fn = $_FILES['image']['tmp_name'];
-		$size[0] = $src[1];
-		$size[1] = $src[2];
-		$ratio = $size[0] / $size[1]; // width/height
-		if ($ratio > 1) {
-			$width = $this->canvas_size[0];
-			$height = $this->canvas_size[1] / $ratio;
-		} else {
-			$width = $this->canvas_size[0] * $ratio;
-			$height = $this->canvas_size[1];
-		}
-
+		$ratio = $src[1] / $src[2]; // width/height
+		$width = 842;
+		$height = 595;
 		return array($width, $height, $ratio);
-		//return array($this->canvas_size[0] * 1.2, $this->canvas_size[1] * 1.2);
 	}
 	/**
 	 * Save the Meta Field
@@ -280,102 +242,6 @@ class Nw2_Certificates_Admin
 		}
 	}
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles()
-	{
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/nw2-certificates-admin.css', array(), $this->version, 'all');
-		if (!wp_script_is('jquery-ui', 'enqueued')) {
-			//Why use 1.11?...
-			wp_enqueue_style('jquery-ui-1.12.1', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css', array(), '1.12.1', 'all');
-		}
-		//wp_enqueue_style('trumbowyg-css', 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.20.0/ui/trumbowyg.min.css', array(), '2.20.0', 'all');
-	}
-
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_scripts()
-	{
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/nw2-certificates-admin.js', array('jquery'), $this->version, false);
-		if (!wp_script_is('jquery-ui', 'enqueued')) {
-			//Why use 1.11?...
-			wp_enqueue_script('jquery-ui-core-1.12.1', 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', array(), '1.12.1', true);
-		}
-		//Best WYSIWYG editor ever!
-		// wp_enqueue_script('trumbowyg', 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.20.0/trumbowyg.min.js', array('jquery'), '2.20.0', true);
-		// wp_enqueue_script('trumbowyg-fontsize', 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.20.0/plugins/fontsize/trumbowyg.fontsize.min.js', array('trumbowyg'), '2.20.0', true);
-	}
-
-	/**
-	 * Register the Event custom post type
-	 *
-	 * @return void
-	 */
-	public function register_cpt_events()
-	{
-		$labels = array(
-			'name'                  => _x('Events Elegible', 'The events that will be used to send certificates', 'nw2-certificates'),
-			'singular_name'         => _x('Event', 'The event that will be used to send certificate', 'nw2-certificates'),
-			'menu_name'             => __('Elegible Events', 'nw2-certificates'),
-			'name_admin_bar'        => __('Elegible Event', 'nw2-certificates'),
-			'archives'              => __('Event Archives', 'nw2-certificates'),
-			'attributes'            => __('Event Attributes', 'nw2-certificates'),
-			'parent_item_colon'     => __('Parent Event:', 'nw2-certificates'),
-			'all_items'             => __('All Events', 'nw2-certificates'),
-			'add_new_item'          => __('Add New Event', 'nw2-certificates'),
-			'add_new'               => __('Add New', 'nw2-certificates'),
-			'new_item'              => __('New Event', 'nw2-certificates'),
-			'edit_item'             => __('Edit Event', 'nw2-certificates'),
-			'update_item'           => __('Update Event', 'nw2-certificates'),
-			'view_item'             => __('View Event', 'nw2-certificates'),
-			'view_items'            => __('View Events', 'nw2-certificates'),
-			'search_items'          => __('Search Event', 'nw2-certificates'),
-			'not_found'             => __('Not found', 'nw2-certificates'),
-			'not_found_in_trash'    => __('Not found in Trash', 'nw2-certificates'),
-			'featured_image'        => __('Featured Image', 'nw2-certificates'),
-			'set_featured_image'    => __('Set featured image', 'nw2-certificates'),
-			'remove_featured_image' => __('Remove featured image', 'nw2-certificates'),
-			'use_featured_image'    => __('Use as featured image', 'nw2-certificates'),
-			'insert_into_item'      => __('Insert into Event', 'nw2-certificates'),
-			'uploaded_to_this_item' => __('Uploaded to this Event', 'nw2-certificates'),
-			'items_list'            => __('Events list', 'nw2-certificates'),
-			'items_list_navigation' => __('Events list navigation', 'nw2-certificates'),
-			'filter_items_list'     => __('Filter Events list', 'nw2-certificates'),
-		);
-		$rewrite = array(
-			'slug'                  => __('events', 'nw2-certificates'),
-			'with_front'            => true,
-			'pages'                 => true,
-			'feeds'                 => true,
-		);
-		$args = array(
-			'label'                 => __('Event', 'nw2-certificates'),
-			'description'           => __('The holding place for all events.', 'nw2-certificates'),
-			'labels'                => $labels,
-			'supports'              => array('title', 'editor', 'excerpt', 'thumbnail',),
-			'hierarchical'          => false,
-			'public'                => false,
-			'show_ui'               => true,
-			'show_in_menu'          => true,
-			'menu_position'         => 5,
-			'menu_icon'             => 'dashicons-calendar',
-			'show_in_admin_bar'     => true,
-			'show_in_nav_menus'     => true,
-			'can_export'            => true,
-			'has_archive'           => false,
-			'exclude_from_search'   => true,
-			'publicly_queryable'    => false,
-			'rewrite'               => false,
-			'capability_type'       => 'post',
-		);
-		register_post_type($this->plugin_cpt, $args);
-	}
 
 	/**
 	 * Enable parameter injection in contact form 7 shortcode
@@ -517,5 +383,101 @@ class Nw2_Certificates_Admin
 			return false;
 		}
 		return true;
+	}
+	/**
+	 * Register the stylesheets for the admin area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles()
+	{
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/nw2-certificates-admin.css', array(), $this->version, 'all');
+		if (!wp_script_is('jquery-ui', 'enqueued')) {
+			//Why use 1.11?...
+			wp_enqueue_style('jquery-ui-1.12.1', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css', array(), '1.12.1', 'all');
+		}
+		//wp_enqueue_style('trumbowyg-css', 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.20.0/ui/trumbowyg.min.css', array(), '2.20.0', 'all');
+	}
+
+	/**
+	 * Register the JavaScript for the admin area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_scripts()
+	{
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/nw2-certificates-admin.js', array('jquery'), $this->version, false);
+		if (!wp_script_is('jquery-ui', 'enqueued')) {
+			//Why use 1.11?...
+			wp_enqueue_script('jquery-ui-core-1.12.1', 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', array(), '1.12.1', true);
+		}
+		//Best WYSIWYG editor ever!
+		// wp_enqueue_script('trumbowyg', 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.20.0/trumbowyg.min.js', array('jquery'), '2.20.0', true);
+		// wp_enqueue_script('trumbowyg-fontsize', 'https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.20.0/plugins/fontsize/trumbowyg.fontsize.min.js', array('trumbowyg'), '2.20.0', true);
+	}
+
+	/**
+	 * Register the Event custom post type
+	 *
+	 * @return void
+	 */
+	public function register_cpt_events()
+	{
+		$labels = array(
+			'name'                  => _x('Events Elegible', 'The events that will be used to send certificates', 'nw2-certificates'),
+			'singular_name'         => _x('Event', 'The event that will be used to send certificate', 'nw2-certificates'),
+			'menu_name'             => __('Elegible Events', 'nw2-certificates'),
+			'name_admin_bar'        => __('Elegible Event', 'nw2-certificates'),
+			'archives'              => __('Event Archives', 'nw2-certificates'),
+			'attributes'            => __('Event Attributes', 'nw2-certificates'),
+			'parent_item_colon'     => __('Parent Event:', 'nw2-certificates'),
+			'all_items'             => __('All Events', 'nw2-certificates'),
+			'add_new_item'          => __('Add New Event', 'nw2-certificates'),
+			'add_new'               => __('Add New', 'nw2-certificates'),
+			'new_item'              => __('New Event', 'nw2-certificates'),
+			'edit_item'             => __('Edit Event', 'nw2-certificates'),
+			'update_item'           => __('Update Event', 'nw2-certificates'),
+			'view_item'             => __('View Event', 'nw2-certificates'),
+			'view_items'            => __('View Events', 'nw2-certificates'),
+			'search_items'          => __('Search Event', 'nw2-certificates'),
+			'not_found'             => __('Not found', 'nw2-certificates'),
+			'not_found_in_trash'    => __('Not found in Trash', 'nw2-certificates'),
+			'featured_image'        => __('Featured Image', 'nw2-certificates'),
+			'set_featured_image'    => __('Set featured image', 'nw2-certificates'),
+			'remove_featured_image' => __('Remove featured image', 'nw2-certificates'),
+			'use_featured_image'    => __('Use as featured image', 'nw2-certificates'),
+			'insert_into_item'      => __('Insert into Event', 'nw2-certificates'),
+			'uploaded_to_this_item' => __('Uploaded to this Event', 'nw2-certificates'),
+			'items_list'            => __('Events list', 'nw2-certificates'),
+			'items_list_navigation' => __('Events list navigation', 'nw2-certificates'),
+			'filter_items_list'     => __('Filter Events list', 'nw2-certificates'),
+		);
+		$rewrite = array(
+			'slug'                  => __('events', 'nw2-certificates'),
+			'with_front'            => true,
+			'pages'                 => true,
+			'feeds'                 => true,
+		);
+		$args = array(
+			'label'                 => __('Event', 'nw2-certificates'),
+			'description'           => __('The holding place for all events.', 'nw2-certificates'),
+			'labels'                => $labels,
+			'supports'              => array('title', 'editor', 'excerpt', 'thumbnail',),
+			'hierarchical'          => false,
+			'public'                => false,
+			'show_ui'               => true,
+			'show_in_menu'          => true,
+			'menu_position'         => 5,
+			'menu_icon'             => 'dashicons-calendar',
+			'show_in_admin_bar'     => true,
+			'show_in_nav_menus'     => true,
+			'can_export'            => true,
+			'has_archive'           => false,
+			'exclude_from_search'   => true,
+			'publicly_queryable'    => false,
+			'rewrite'               => false,
+			'capability_type'       => 'post',
+		);
+		register_post_type($this->plugin_cpt, $args);
 	}
 }

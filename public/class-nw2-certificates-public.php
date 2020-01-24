@@ -61,7 +61,7 @@ class Nw2_Certificates_Public
 	 * @access   private
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
-	private $dpi = 96; //NW2 in keyboard numeric
+	private $dpi = 72; //Don't change this!
 	/**
 	 * The ID of post type.
 	 *
@@ -131,13 +131,21 @@ class Nw2_Certificates_Public
 
 
 
-		$this->get_paper_size();
+		$this->set_paper_size();
 
-		$this->Mpdf_args['mode'] = 'utf-8';
-		$this->Mpdf_args['dpi'] = $this->dpi;
-		$this->Mpdf_args['default_font_size'] = 12;
-		$this->Mpdf_args['default_font'] = 'Arial, sans-serif';
-		$this->Mpdf_args['keep_table_proportions'] = false;
+		$this->Mpdf_args['mode'] 						= 'utf-8';
+		$this->Mpdf_args['dpi'] 						= $this->dpi;
+		$this->Mpdf_args['debug'] 						= $this->dpi;
+		$this->Mpdf_args['debugfonts'] 					= $this->dpi;
+		$this->Mpdf_args['showImageErrors'] 			= $this->dpi;
+		$this->Mpdf_args['keep_table_proportions'] 		= false;
+		$this->Mpdf_args['margin_left'] 				= 0;
+		$this->Mpdf_args['margin_right'] 				= 0;
+		$this->Mpdf_args['margin_top'] 					= 0;
+		$this->Mpdf_args['margin_bottom'] 				= 0;
+		//$this->Mpdf_args['default_font_size'] = 12;
+		$this->Mpdf_args['default_font'] 				= 'sans-serif';
+		//$this->Mpdf_args['fontdata'] 					= array('sans-serif');
 
 		$mpdf = new \Mpdf\Mpdf(
 			$this->Mpdf_args
@@ -155,33 +163,9 @@ class Nw2_Certificates_Public
 		$mpdf->Output();
 	}
 
-	public function get_paper_size()
+	public function set_paper_size()
 	{
-
-		$src = wp_get_attachment_image_src(get_post_thumbnail_id($this->id_event), 'full', false);
-		if (!$src) {
-			// no featured image, using a4 format
-			$this->Mpdf_args['format'] =  'A4-L';
-			return;
-		}
-		if ($src[1] < $src[2]) {
-			$orientation = "L"; // for Landscape
-		} else {
-			$orientation = "P";  // for Portrait
-		}
-		$this->Mpdf_args['orientation'] = $orientation;
-		
-		$ww = ((25.4 * $src[1]) / $this->dpi);
-		$hh = ((25.4 * $src[2]) / $this->dpi);
-
-		$ww =  $src[1] * 0.084667;
-		$hh = $src[2] * 0.084667;
-		//mm = ( pixels * 25.4 ) / DPI
-		$this->Mpdf_args['format'] = array(
-			$ww,
-			$hh,
-		);
-		//$this->Mpdf_args['format'] =  'A4-L';
+		$this->Mpdf_args['format'] =  'A4-L';
 		return;
 	}
 
