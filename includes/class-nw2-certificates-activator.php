@@ -20,7 +20,8 @@
  * @subpackage Nw2_Certificates/includes
  * @author     Fausto Rodrigo Toloi <fausto@nw2web.com.br>
  */
-class Nw2_Certificates_Activator {
+class Nw2_Certificates_Activator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,14 @@ class Nw2_Certificates_Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() {
-
+	public static function activate()
+	{
+		if (!in_array('contact-form-7/wp-contact-form-7.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+			error_log( 'NW2 Certificates plugin needs Contact Form 7' );
+			$args = var_export( func_get_args(), true );
+			error_log( $args );
+			wp_die( 'NW2 Certificates plugin needs Contact Form 7' );
+	
+		}
 	}
-
 }

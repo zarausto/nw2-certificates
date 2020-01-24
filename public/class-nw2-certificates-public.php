@@ -1,8 +1,5 @@
 <?php
 
-//use ReduxFramework;
-//ReduxFramework::setArgs($opt_name, $args);
-
 /**
  * The public-facing functionality of the plugin.
  *
