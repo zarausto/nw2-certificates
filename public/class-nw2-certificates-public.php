@@ -132,9 +132,9 @@ class Nw2_Certificates_Public
 
 		$this->Mpdf_args['mode'] 						= 'utf-8';
 		$this->Mpdf_args['dpi'] 						= $this->dpi;
-		$this->Mpdf_args['debug'] 						= $this->dpi;
-		$this->Mpdf_args['debugfonts'] 					= $this->dpi;
-		$this->Mpdf_args['showImageErrors'] 			= $this->dpi;
+		$this->Mpdf_args['debug'] 						= false;
+		$this->Mpdf_args['debugfonts'] 					= false;
+		$this->Mpdf_args['showImageErrors'] 			= false;
 		$this->Mpdf_args['keep_table_proportions'] 		= false;
 		$this->Mpdf_args['margin_left'] 				= 0;
 		$this->Mpdf_args['margin_right'] 				= 0;

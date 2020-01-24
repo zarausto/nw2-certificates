@@ -36,6 +36,7 @@ class RemoteContentFetcher implements \Psr\Log\LoggerAwareInterface
 		curl_setopt($ch, CURLOPT_NOBODY, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->mpdf->curlTimeout);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE); //Cloudflare flexible ssl fix
 
 		if ($this->mpdf->curlFollowLocation) {
 			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
