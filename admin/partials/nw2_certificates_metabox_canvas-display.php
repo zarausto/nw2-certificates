@@ -179,7 +179,7 @@
                     $('.ui-resizable-handle').mouseenter(function() {
                             $(this).parent().resizable('enable');
                             $(this).parent().draggable('disable');
-                            $(this).parent().prop('contenteditable', false);
+                            $(this).parent().prop('contenteditable', true);
                         })
                         .mouseleave(function() {
                             $(this).parent().draggable('enable');

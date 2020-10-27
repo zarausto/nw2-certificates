@@ -132,10 +132,12 @@ class Nw2_Certificates_Public
 
 		$this->Mpdf_args['mode'] 						= 'utf-8';
 		$this->Mpdf_args['dpi'] 						= $this->dpi;
-		$this->Mpdf_args['debug'] 						= false;
-		$this->Mpdf_args['debugfonts'] 					= false;
-		$this->Mpdf_args['showImageErrors'] 			= false;
+		// $this->Mpdf_args['debug'] 					= false;
+		// $this->Mpdf_args['debugfonts'] 				= false;
+		$this->Mpdf_args['showImageErrors'] 			= true;
 		$this->Mpdf_args['keep_table_proportions'] 		= false;
+		$this->Mpdf_args['curlAllowUnsafeSslRequests'] 	= true; //curlAllowUnsafeSslRequests = true;
+
 		$this->Mpdf_args['margin_left'] 				= 0;
 		$this->Mpdf_args['margin_right'] 				= 0;
 		$this->Mpdf_args['margin_top'] 					= 0;
@@ -169,12 +171,12 @@ class Nw2_Certificates_Public
 	public function define_background(Mpdf $mpdf)
 	{
 		$src = wp_get_attachment_image_src(get_post_thumbnail_id($this->id_event), 'full', false);
-		if (!$src)
-			$mpdf->SetDefaultBodyCSS('background', "white");
+		// if (!$src)
+		// 	$mpdf->SetDefaultBodyCSS('background', "white");
 
 		//$mpdf->SetDefaultBodyCSS('background', "url('" . $src[0] . "')");
 		//$mpdf->SetDefaultBodyCSS('background-image-resize:', 6);
-
+		$src[0] = str_replace("https://certifica.marketeria.com.br/wp-content/uploads","/home/marketeria/www/certifica/wp-content/uploads",$src[0]);
 		$html =
 			"@page {
 			margin: 0%; 						
@@ -183,8 +185,8 @@ class Nw2_Certificates_Public
 			background: url('" . $src[0] . "');
 			background-image-resize: 6;
 		}
-		body,div,span.html { 
-			border:1px solid red;
+		body,div,span,html { 
+			/*border:1px solid red;/**/
 		}";
 		$mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HEADER_CSS);
 
@@ -201,6 +203,7 @@ class Nw2_Certificates_Public
 		foreach ($data as $key => $value) {
 			$canvas = str_replace('[' . $key . ']', $value, $canvas);
 		}
+		$canvas = str_replace("https://certifica.marketeria.com.br/wp-content/uploads","/home/marketeria/www/certifica/wp-content/uploads",$canvas);
 		echo $canvas;
 
 		$c .= ob_get_contents();
